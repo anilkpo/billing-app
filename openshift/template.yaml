@@ -12,7 +12,7 @@ parameters:
   - name: GIT_REPO
     value: ""
   - name: GIT_REF
-    value: main
+    value: master
   - name: IMAGE_TAG
     value: latest
   - name: APP_PORT

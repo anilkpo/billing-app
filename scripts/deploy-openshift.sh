@@ -3,7 +3,7 @@ set -euo pipefail
 
 PROJECT="billing"
 APP_NAME="billing-app"
-GIT_REF="main"
+GIT_REF="master"
 DB_HOST="postgresql"
 DB_PORT="5432"
 DB_NAME="billing_db"

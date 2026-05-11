@@ -3,7 +3,7 @@ param(
   [string]$Repo,
   [string]$Project = "billing",
   [string]$AppName = "billing-app",
-  [string]$GitRef = "main",
+  [string]$GitRef = "master",
   [string]$DbHost = "postgresql",
   [string]$DbPort = "5432",
   [string]$DbName = "billing_db",

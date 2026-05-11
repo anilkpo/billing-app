@@ -97,7 +97,7 @@ oc apply -f openshift/postgresql.yaml -n billing
 oc process -f openshift/template.yaml \
   -p NAMESPACE=billing \
   -p GIT_REPO=https://github.com/<your-org>/<your-repo>.git \
-  -p GIT_REF=main \
+  -p GIT_REF=master \
   -p DB_URL=jdbc:postgresql://postgresql.billing.svc.cluster.local:5432/billing_db \
   -p DB_USERNAME=postgres \
   -p DB_PASSWORD=postgres | oc apply -f -
