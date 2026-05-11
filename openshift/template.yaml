@@ -1,0 +1,149 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+metadata:
+  name: billing-app-template
+labels:
+  app: ${APP_NAME}
+parameters:
+  - name: APP_NAME
+    value: billing-app
+  - name: NAMESPACE
+    value: billing
+  - name: GIT_REPO
+    value: ""
+  - name: GIT_REF
+    value: main
+  - name: IMAGE_TAG
+    value: latest
+  - name: APP_PORT
+    value: "8080"
+  - name: DB_URL
+    value: jdbc:postgresql://postgresql.billing.svc.cluster.local:5432/billing_db
+  - name: DB_USERNAME
+    value: postgres
+  - name: DB_PASSWORD
+    value: postgres
+objects:
+  - apiVersion: image.openshift.io/v1
+    kind: ImageStream
+    metadata:
+      name: ${APP_NAME}
+      namespace: ${NAMESPACE}
+      labels:
+        app: ${APP_NAME}
+  - apiVersion: build.openshift.io/v1
+    kind: BuildConfig
+    metadata:
+      name: ${APP_NAME}
+      namespace: ${NAMESPACE}
+      labels:
+        app: ${APP_NAME}
+    spec:
+      source:
+        type: Git
+        git:
+          uri: ${GIT_REPO}
+          ref: ${GIT_REF}
+      strategy:
+        type: Docker
+        dockerStrategy:
+          dockerfilePath: Dockerfile
+      output:
+        to:
+          kind: ImageStreamTag
+          name: ${APP_NAME}:${IMAGE_TAG}
+      triggers:
+        - type: ConfigChange
+        - type: ImageChange
+  - apiVersion: v1
+    kind: Secret
+    metadata:
+      name: ${APP_NAME}-db
+      namespace: ${NAMESPACE}
+      labels:
+        app: ${APP_NAME}
+    stringData:
+      DB_URL: ${DB_URL}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+    type: Opaque
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: ${APP_NAME}
+      namespace: ${NAMESPACE}
+      labels:
+        app: ${APP_NAME}
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: ${APP_NAME}
+      template:
+        metadata:
+          labels:
+            app: ${APP_NAME}
+        spec:
+          containers:
+            - name: ${APP_NAME}
+              image: image-registry.openshift-image-registry.svc:5000/${NAMESPACE}/${APP_NAME}:${IMAGE_TAG}
+              ports:
+                - containerPort: ${{APP_PORT}}
+                  protocol: TCP
+              envFrom:
+                - secretRef:
+                    name: ${APP_NAME}-db
+              env:
+                - name: JPA_DDL_AUTO
+                  value: update
+                - name: JPA_SHOW_SQL
+                  value: "false"
+              readinessProbe:
+                httpGet:
+                  path: /api/fees
+                  port: ${{APP_PORT}}
+                initialDelaySeconds: 20
+                periodSeconds: 10
+              livenessProbe:
+                httpGet:
+                  path: /api/fees
+                  port: ${{APP_PORT}}
+                initialDelaySeconds: 40
+                periodSeconds: 20
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 256Mi
+                limits:
+                  cpu: 500m
+                  memory: 512Mi
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      name: ${APP_NAME}
+      namespace: ${NAMESPACE}
+      labels:
+        app: ${APP_NAME}
+    spec:
+      selector:
+        app: ${APP_NAME}
+      ports:
+        - name: http
+          port: 80
+          targetPort: ${{APP_PORT}}
+          protocol: TCP
+  - apiVersion: route.openshift.io/v1
+    kind: Route
+    metadata:
+      name: ${APP_NAME}
+      namespace: ${NAMESPACE}
+      labels:
+        app: ${APP_NAME}
+    spec:
+      to:
+        kind: Service
+        name: ${APP_NAME}
+      port:
+        targetPort: http
+      tls:
+        termination: edge
