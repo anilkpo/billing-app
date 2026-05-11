@@ -40,8 +40,11 @@ spec:
         app: postgresql
     spec:
       securityContext:
-        fsGroup: 26
-        fsGroupChangePolicy: OnRootMismatch
+         runAsNonRoot: true
+         seccompProfile:
+            type: RuntimeDefault
+      #  fsGroup: 26
+     #   fsGroupChangePolicy: OnRootMismatch
       containers:
         - name: postgresql
           image: postgres:16
