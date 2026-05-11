@@ -39,6 +39,9 @@ spec:
       labels:
         app: postgresql
     spec:
+      securityContext:
+        fsGroup: 26
+        fsGroupChangePolicy: OnRootMismatch
       containers:
         - name: postgresql
           image: postgres:16
@@ -61,6 +64,8 @@ spec:
                 secretKeyRef:
                   name: postgres-secret
                   key: POSTGRES_PASSWORD
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
           volumeMounts:
             - name: postgresql-data
               mountPath: /var/lib/postgresql/data
