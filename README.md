@@ -120,10 +120,22 @@ chmod +x scripts/deploy-openshift.sh
 ./scripts/deploy-openshift.sh --repo https://github.com/<your-org>/<your-repo>.git
 ```
 
+Restricted cluster (no project-create permission):
+
+```bash
+./scripts/deploy-openshift.sh --repo https://github.com/<your-org>/<your-repo>.git --project <existing-project> --skip-project-create
+```
+
 Windows PowerShell:
 
 ```powershell
 .\scripts\deploy-openshift.ps1 -Repo https://github.com/<your-org>/<your-repo>.git
+```
+
+Restricted cluster (no project-create permission):
+
+```powershell
+.\scripts\deploy-openshift.ps1 -Repo https://github.com/<your-org>/<your-repo>.git -Project <existing-project> -SkipProjectCreate
 ```
 
 Both scripts support optional overrides:

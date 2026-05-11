@@ -8,7 +8,8 @@ param(
   [string]$DbPort = "5432",
   [string]$DbName = "billing_db",
   [string]$DbUser = "postgres",
-  [string]$DbPassword = "postgres"
+  [string]$DbPassword = "postgres",
+  [switch]$SkipProjectCreate
 )
 
 $ErrorActionPreference = "Stop"
@@ -27,6 +28,9 @@ try {
   $projectExists = $false
 }
 if (-not $projectExists) {
+  if ($SkipProjectCreate) {
+    throw "Project '$Project' does not exist and -SkipProjectCreate was set. Ask your OpenShift admin to create it, then rerun."
+  }
   oc new-project $Project | Out-Null
 }
 oc project $Project | Out-Null

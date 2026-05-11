@@ -9,6 +9,7 @@ DB_PORT="5432"
 DB_NAME="billing_db"
 DB_USERNAME="postgres"
 DB_PASSWORD="postgres"
+SKIP_PROJECT_CREATE="false"
 
 usage() {
   cat <<EOF
@@ -26,6 +27,7 @@ Optional:
   --db-name      PostgreSQL database name (default: billing_db)
   --db-user      PostgreSQL username (default: postgres)
   --db-password  PostgreSQL password (default: postgres)
+  --skip-project-create  Do not create project; require it to already exist
 EOF
 }
 
@@ -41,6 +43,7 @@ while [[ $# -gt 0 ]]; do
     --db-name) DB_NAME="$2"; shift 2 ;;
     --db-user) DB_USERNAME="$2"; shift 2 ;;
     --db-password) DB_PASSWORD="$2"; shift 2 ;;
+    --skip-project-create) SKIP_PROJECT_CREATE="true"; shift 1 ;;
     -h|--help) usage; exit 0 ;;
     *) echo "Unknown option: $1"; usage; exit 1 ;;
   esac
@@ -60,7 +63,14 @@ fi
 DB_URL="jdbc:postgresql://${DB_HOST}.${PROJECT}.svc.cluster.local:${DB_PORT}/${DB_NAME}"
 
 echo "[1/5] Ensuring project '${PROJECT}' exists"
-oc get project "${PROJECT}" >/dev/null 2>&1 || oc new-project "${PROJECT}"
+if ! oc get project "${PROJECT}" >/dev/null 2>&1; then
+  if [[ "${SKIP_PROJECT_CREATE}" == "true" ]]; then
+    echo "Error: project '${PROJECT}' does not exist and --skip-project-create was set."
+    echo "Ask your OpenShift admin to create it, then rerun."
+    exit 1
+  fi
+  oc new-project "${PROJECT}"
+fi
 oc project "${PROJECT}" >/dev/null
 
 echo "[2/5] Deploying PostgreSQL"
