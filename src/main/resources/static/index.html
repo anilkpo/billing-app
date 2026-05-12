@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FeeTrack Pro</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="bg-orb orb-a"></div>
+  <div class="bg-orb orb-b"></div>
+  <div class="bg-grid"></div>
+
+  <main class="container">
+    <header class="hero glass">
+      <p class="eyebrow">Billing Control Center</p>
+      <h1>FeeTrack Pro</h1>
+      <p class="sub">Track fee payments and generate premium PDF bills instantly.</p>
+    </header>
+
+    <section class="panel glass">
+      <div class="section-head">
+        <h2>Create Fee Entry</h2>
+      </div>
+      <form id="feeForm" class="form-grid">
+        <label>
+          Student Name
+          <input id="studentName" required placeholder="Anil Kumar" />
+        </label>
+        <label>
+          Student Email
+          <input id="studentEmail" type="email" required placeholder="anil@example.com" />
+        </label>
+        <label>
+          Course
+          <input id="courseName" required placeholder="Spring Boot" />
+        </label>
+        <label>
+          Amount
+          <input id="amount" type="number" step="0.01" min="0.01" required placeholder="25000" />
+        </label>
+        <label>
+          Payment Date
+          <input id="paymentDate" type="date" required />
+        </label>
+        <label>
+          Status
+          <select id="status" required>
+            <option value="PAID">PAID</option>
+            <option value="PENDING">PENDING</option>
+            <option value="FAILED">FAILED</option>
+          </select>
+        </label>
+        <button type="submit" class="btn-primary">Save Fee Entry</button>
+      </form>
+      <p id="message" class="message"></p>
+    </section>
+
+    <section class="panel glass">
+      <div class="section-head section-row">
+        <h2>Fee Records</h2>
+        <button id="refreshBtn" class="btn-secondary" type="button">Refresh</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Course</th>
+              <th>Amount</th>
+              <th>Date</th>
+              <th>Status</th>
+              <th>Bill</th>
+            </tr>
+          </thead>
+          <tbody id="feeTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
