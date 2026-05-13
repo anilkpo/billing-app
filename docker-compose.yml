@@ -1,0 +1,41 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16
+    container_name: billing-db
+    environment:
+      POSTGRES_DB: billing_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - billing-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d billing_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: billing-app
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/billing_db
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+      JPA_DDL_AUTO: update
+      JPA_SHOW_SQL: "false"
+      SERVER_PORT: 8080
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+
+volumes:
+  billing-db-data:
