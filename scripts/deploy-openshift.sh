@@ -75,10 +75,6 @@ oc project "${PROJECT}" >/dev/null
 
 echo "[2/5] Deploying PostgreSQL"
 oc apply -f openshift/postgresql.yaml -n "${PROJECT}"
-oc set env deployment/postgresql \
-  POSTGRES_DB="${DB_NAME}" \
-  POSTGRES_USER="${DB_USERNAME}" \
-  POSTGRES_PASSWORD="${DB_PASSWORD}" -n "${PROJECT}"
 oc patch secret postgres-secret -n "${PROJECT}" --type merge -p "{\"stringData\":{\"POSTGRES_DB\":\"${DB_NAME}\",\"POSTGRES_USER\":\"${DB_USERNAME}\",\"POSTGRES_PASSWORD\":\"${DB_PASSWORD}\"}}"
 
 echo "[3/5] Deploying app resources"

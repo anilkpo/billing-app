@@ -37,7 +37,6 @@ oc project $Project | Out-Null
 
 Write-Host "[2/5] Deploying PostgreSQL"
 oc apply -f openshift/postgresql.yaml -n $Project | Out-Null
-oc set env deployment/postgresql POSTGRES_DB=$DbName POSTGRES_USER=$DbUser POSTGRES_PASSWORD=$DbPassword -n $Project | Out-Null
 oc patch secret postgres-secret -n $Project --type merge -p "{\"stringData\":{\"POSTGRES_DB\":\"$DbName\",\"POSTGRES_USER\":\"$DbUser\",\"POSTGRES_PASSWORD\":\"$DbPassword\"}}" | Out-Null
 
 Write-Host "[3/5] Deploying app resources"
