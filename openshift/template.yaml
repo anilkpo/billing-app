@@ -88,7 +88,7 @@ objects:
             - name: ${APP_NAME}
               image: image-registry.openshift-image-registry.svc:5000/${NAMESPACE}/${APP_NAME}:${IMAGE_TAG}
               ports:
-                - containerPort: ${{APP_PORT}}
+                - containerPort: ${APP_PORT}
                   protocol: TCP
               envFrom:
                 - secretRef:
@@ -101,13 +101,13 @@ objects:
               readinessProbe:
                 httpGet:
                   path: /api/fees
-                  port: ${{APP_PORT}}
+                  port: ${APP_PORT}
                 initialDelaySeconds: 20
                 periodSeconds: 10
               livenessProbe:
                 httpGet:
                   path: /api/fees
-                  port: ${{APP_PORT}}
+                  port: ${APP_PORT}
                 initialDelaySeconds: 40
                 periodSeconds: 20
               resources:
@@ -130,7 +130,7 @@ objects:
       ports:
         - name: http
           port: 80
-          targetPort: ${{APP_PORT}}
+          targetPort: ${APP_PORT}
           protocol: TCP
   - apiVersion: route.openshift.io/v1
     kind: Route
