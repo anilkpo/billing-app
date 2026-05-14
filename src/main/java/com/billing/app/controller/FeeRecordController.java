@@ -40,12 +40,12 @@ public class FeeRecordController {
         return feeRecordService.search(query);
     }
 
-    @GetMapping("/{id}")
-    public FeeRecord getFeeRecordById(@PathVariable Long id) {
-        return feeRecordService.findById(id);
+    @GetMapping("/{id:[0-9]+}")
+    public FeeRecord getFeeRecordById(@PathVariable String id) {
+        return feeRecordService.findById(parseId(id));
     }
 
-    @GetMapping("/{id}/bill")
+    @GetMapping("/{id:[0-9]+}/bill")
     public ResponseEntity<byte[]> generateBill(@PathVariable String id) {
         return buildBillResponse(parseId(id));
     }

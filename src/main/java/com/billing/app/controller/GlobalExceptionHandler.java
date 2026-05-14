@@ -2,8 +2,10 @@ package com.billing.app.controller;
 
 import java.time.Instant;
 import java.util.Map;
+import org.springframework.core.convert.ConversionFailedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.beans.TypeMismatchException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -43,5 +45,14 @@ public class GlobalExceptionHandler {
                         "timestamp", Instant.now().toString(),
                         "error", "Bad Request",
                         "message", message));
+    }
+
+    @ExceptionHandler({TypeMismatchException.class, ConversionFailedException.class})
+    public ResponseEntity<Map<String, Object>> handleConversion(Exception exception) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(Map.of(
+                        "timestamp", Instant.now().toString(),
+                        "error", "Bad Request",
+                        "message", "Invalid request parameter or path value."));
     }
 }
