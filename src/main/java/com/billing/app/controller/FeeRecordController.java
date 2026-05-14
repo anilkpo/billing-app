@@ -46,13 +46,18 @@ public class FeeRecordController {
     }
 
     @GetMapping("/{id}/bill")
-    public ResponseEntity<byte[]> generateBill(@PathVariable Long id) {
-        return buildBillResponse(id);
+    public ResponseEntity<byte[]> generateBill(@PathVariable String id) {
+        return buildBillResponse(parseId(id));
     }
 
     @GetMapping("/bill")
-    public ResponseEntity<byte[]> generateBillByQueryParam(@RequestParam Long id) {
-        return buildBillResponse(id);
+    public ResponseEntity<byte[]> generateBillByQueryParam(@RequestParam String id) {
+        return buildBillResponse(parseId(id));
+    }
+
+    @GetMapping("/download/{id}")
+    public ResponseEntity<byte[]> downloadBill(@PathVariable String id) {
+        return buildBillResponse(parseId(id));
     }
 
     private ResponseEntity<byte[]> buildBillResponse(Long id) {
@@ -66,5 +71,21 @@ public class FeeRecordController {
         return ResponseEntity.ok()
                 .headers(headers)
                 .body(pdf);
+    }
+
+    private Long parseId(String rawId) {
+        if (rawId == null) {
+            throw new IllegalArgumentException("Invalid fee record id.");
+        }
+        String normalized = rawId.trim();
+        int semicolonIndex = normalized.indexOf(';');
+        if (semicolonIndex >= 0) {
+            normalized = normalized.substring(0, semicolonIndex);
+        }
+        try {
+            return Long.parseLong(normalized);
+        } catch (NumberFormatException ex) {
+            throw new IllegalArgumentException("Invalid fee record id: " + rawId);
+        }
     }
 }

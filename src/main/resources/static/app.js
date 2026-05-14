@@ -23,22 +23,14 @@ function setMessage(text, isError = false) {
   message.style.color = isError ? "#ff8e8e" : "#83ffb7";
 }
 
-async function downloadBill(id) {
-  const response = await fetch(`/api/fees/bill?id=${encodeURIComponent(id)}`);
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({}));
-    throw new Error(error.message || "Failed to download PDF");
-  }
-
-  const blob = await response.blob();
-  const url = window.URL.createObjectURL(blob);
+function downloadBill(id) {
   const link = document.createElement("a");
-  link.href = url;
-  link.download = `bill-${id}.pdf`;
+  link.href = `/api/fees/download/${id}`;
+  link.target = "_blank";
+  link.rel = "noopener";
   document.body.appendChild(link);
   link.click();
   link.remove();
-  window.URL.revokeObjectURL(url);
 }
 
 async function loadFees(query = "") {
@@ -83,7 +75,7 @@ tableBody.addEventListener("click", async (event) => {
   }
 
   try {
-    await downloadBill(id);
+    downloadBill(id);
     setMessage(`Downloaded bill for candidate ID ${id}.`);
   } catch (error) {
     setMessage(error.message, true);
