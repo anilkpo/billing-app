@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -35,8 +36,8 @@ public class FeeRecordController {
     }
 
     @GetMapping
-    public List<FeeRecord> getAllFeeRecords() {
-        return feeRecordService.findAll();
+    public List<FeeRecord> getAllFeeRecords(@RequestParam(required = false) String query) {
+        return feeRecordService.search(query);
     }
 
     @GetMapping("/{id}")
@@ -46,6 +47,15 @@ public class FeeRecordController {
 
     @GetMapping("/{id}/bill")
     public ResponseEntity<byte[]> generateBill(@PathVariable Long id) {
+        return buildBillResponse(id);
+    }
+
+    @GetMapping("/bill")
+    public ResponseEntity<byte[]> generateBillByQueryParam(@RequestParam Long id) {
+        return buildBillResponse(id);
+    }
+
+    private ResponseEntity<byte[]> buildBillResponse(Long id) {
         FeeRecord feeRecord = feeRecordService.findById(id);
         byte[] pdf = billPdfService.generateBill(feeRecord);
 
